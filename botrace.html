@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Fight - Typing Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: filter 0.3s ease;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Menu Button Styles */
+    .menu-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Side Navigation Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(to bottom, #3498db, #2c3e50);
+      z-index: 200;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 150;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
+
+    .menu-header {
+      padding: 30px 20px 20px;
+      color: white;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .menu-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .menu-items {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #e74c3c;
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .race-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .race-side {
+      flex: 1;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .race-side h2 {
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .sentence-container {
+      margin-bottom: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+      min-height: 60px;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .current-word {
+      background-color: #ffffcc;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .correct-word {
+      color: green;
+    }
+
+    .incorrect-word {
+      color: red;
+      text-decoration: line-through;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-box h3 {
+      margin: 0 0 10px;
+      color: #555;
+      font-size: 18px;
+    }
+
+    .stat-box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .start-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .start-button:hover {
+      background-color: #45a049;
+    }
+
+    .reset-button {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .reset-button:hover {
+      background-color: #e53935;
+    }
+
+    .back-button {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+
+    .difficulty-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .difficulty-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .easy {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .medium {
+      background-color: #FFA500;
+      color: white;
+    }
+
+    .hard {
+      background-color: #FF4500;
+      color: white;
+    }
+
+    .expert {
+      background-color: #8B0000;
+      color: white;
+    }
+
+    /* Results Popup */
+    .results-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    .results-popup {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .results-popup h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .results-popup p {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .results-popup .close-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .results-popup .close-button:hover {
+      background-color: #45a049;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .race-container {
+        flex-direction: column;
+      }
+      
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .side-menu {
+        width: 80%;
+        left: -100%;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .difficulty-buttons {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu Button -->
+  <button class="menu-button">☰</button>
+
+  <!-- Side Navigation Menu -->
+  <div class="side-menu">
+    <div class="menu-header">
+      <h2>Typing Modes</h2>
+    </div>
+    <div class="menu-items">
+      <button class="menu-item" data-target="index.html">
+        <i>🏠</i> Standard Typing
+      </button>
+      <button class="menu-item" data-target="timedrace.html">
+        <i>⏱️</i> Timed Race
+      </button>
+      <button class="menu-item" data-target="typingexam.html">
+        <i>📝</i> Typing Exam
+      </button>
+      <button class="menu-item" data-target="botrace.html">
+        <i>🤖</i> Bot Race
+      </button>
+    </div>
+    <div class="menu-footer">
+      <p>Typing Aptitude Tester v2.0</p>
+    </div>
+  </div>
+
+  <!-- Menu Overlay -->
+  <div class="menu-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Bot Fight - Typing Test</h1>
+    <div class="difficulty-buttons" id="difficulty-buttons">
+      <button class="easy" id="easy">Easy (20-25 WPM)</button>
+      <button class="medium" id="medium">Medium (30-45 WPM)</button>
+      <button class="hard" id="hard">Hard (50-65 WPM)</button>
+      <button class="expert" id="expert">Expert (70-80 WPM)</button>
+    </div>
+    <div class="race-container">
+      <div class="race-side">
+        <h2>You</h2>
+        <div class="sentence-container" id="user-sentence-container"></div>
+        <input type="text" id="user-input" placeholder="Start typing..." autofocus>
+        <div class="stat-box">
+          <h3>Your WPM</h3>
+          <p id="user-wpm">0</p>
+        </div>
+      </div>
+      <div class="race-side">
+        <h2>Bot</h2>
+        <div class="sentence-container" id="bot-sentence-container"></div>
+        <input type="text" id="bot-input" placeholder="Bot is typing..." disabled>
+        <div class="stat-box">
+          <h3>Bot WPM</h3>
+          <p id="bot-wpm">0</p>
+        </div>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="start-button" id="start-button">Start Race</button>
+      <button class="reset-button" id="reset-button">Reset</button>
+      <button class="back-button" id="back-button">Back to Main</button>
+    </div>
+  </div>
+
+  <!-- Results Popup -->
+  <div class="results-overlay" id="results-overlay">
+    <div class="results-popup">
+      <h2 id="results-title">Race Finished!</h2>
+      <p id="results-message"></p>
+      <p>Your WPM: <span id="final-user-wpm">0</span></p>
+      <p>Bot WPM: <span id="final-bot-wpm">0</span></p>
+      <p>Words Typed: <span id="final-words">0</span></p>
+      <p>Accuracy: <span id="final-accuracy">0%</span></p>
+      <button class="close-button" id="close-results">Close</button>
+    </div>
+  </div>
+
+  <!-- Audio elements for sound effects -->
+  <audio id="keyboard-sound" src="keyboard_clicks.mp3"></audio>
+  <audio id="win-sound" src="race_finished.mp3"></audio>
+  <audio id="lose-sound" src="game_over.mp3"></audio>
+
+  <script>
+    const sentences = [
+      "The quick brown fox jumps over the lazy dog.",
+      "Programming is the art of telling another human what one wants the computer to do.",
+      "Practice makes perfect, especially when it comes to typing.",
+      "Coding is fun and challenging at the same time.",
+      "Always strive to learn something new every day.",
+      "The best way to predict the future is to create it.",
+      "Consistency is the key to success in any field.",
+      "Never stop learning because life never stops teaching.",
+      "Hard work beats talent when talent doesn't work hard.",
+      "Success is the sum of small efforts repeated day in and day out.",
+      "She sells seashells by the seashore.",
+      "Unique New York, Unique New York.",
+      "Red lorry, yellow lorry, red lorry, yellow lorry.",
+      "Peter Piper picked a peck of pickled peppers.",
+      "How much wood would a woodchuck chuck if a woodchuck could chuck wood?",
+      "Typing fast is a useful skill in school and at work.",
+      "Always check your spelling and grammar before submitting.",
+      "Learning new things every day keeps the mind sharp."
+    ];
+
+    // DOM elements
+    const userSentenceContainer = document.getElementById("user-sentence-container");
+    const botSentenceContainer = document.getElementById("bot-sentence-container");
+    const userInput = document.getElementById("user-input");
+    const botInput = document.getElementById("bot-input");
+    const userWpmDisplay = document.getElementById("user-wpm");
+    const botWpmDisplay = document.getElementById("bot-wpm");
+    const startButton = document.getElementById("start-button");
+    const resetButton = document.getElementById("reset-button");
+    const backButton = document.getElementById("back-button");
+    const difficultyButtons = document.getElementById("difficulty-buttons");
+    const resultsOverlay = document.getElementById("results-overlay");
+    const resultsTitle = document.getElementById("results-title");
+    const resultsMessage = document.getElementById("results-message");
+    const finalUserWpm = document.getElementById("final-user-wpm");
+    const finalBotWpm = document.getElementById("final-bot-wpm");
+    const finalWords = document.getElementById("final-words");
+    const finalAccuracy = document.getElementById("final-accuracy");
+    const closeResults = document.getElementById("close-results");
+    const menuButton = document.querySelector('.menu-button');
+    const sideMenu = document.querySelector('.side-menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    // Audio elements
+    const keyboardSound = document.getElementById("keyboard-sound");
+    const winSound = document.getElementById("win-sound");
+    const loseSound = document.getElementById("lose-sound");
+
+    // State
+    let currentSentence = "";
+    let words = [];
+    let userTypedWords = [];
+    let botTypedWords = [];
+    let userCurrentWordIndex = 0;
+    let botCurrentWordIndex = 0;
+    let userStartTime = null;
+    let botStartTime = null;
+    let botTypingInterval = null;
+    let botWpm = 0;
+    let selectedDifficulty = null;
+    let raceActive = false;
+
+    // Bot typing speeds (WPM ranges)
+    const difficultySpeeds = {
+      easy: { min: 20, max: 25 },
+      medium: { min: 30, max: 45 },
+      hard: { min: 50, max: 65 },
+      expert: { min: 70, max: 80 }
+    };
+
+    // Menu functionality
+    const toggleMenu = () => {
+      sideMenu.classList.toggle('active');
+      menuOverlay.classList.toggle('active');
+    };
+
+    const closeMenu = () => {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    };
+
+    const navigateTo = (url) => {
+      window.location.href = url;
+    };
+
+    // Menu event listeners
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navigateTo(item.getAttribute('data-target'));
+      });
+    });
+
+    // Initialize the test
+    const initializeTest = () => {
+      currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+      words = currentSentence.split(" ");
+      userTypedWords = [];
+      botTypedWords = [];
+      userCurrentWordIndex = 0;
+      botCurrentWordIndex = 0;
+      userStartTime = null;
+      botStartTime = null;
+      botWpm = 0;
+      userWpmDisplay.textContent = 0;
+      botWpmDisplay.textContent = 0;
+      userInput.value = "";
+      botInput.value = "";
+      userInput.focus();
+      raceActive = false;
+      renderSentences();
+      clearInterval(botTypingInterval); // Stop bot typing
+    };
+
+    // Simulate bot typing character by character
+    const simulateBotTyping = () => {
+      const speed = difficultySpeeds[selectedDifficulty];
+      botWpm = Math.floor(Math.random() * (speed.max - speed.min + 1)) + speed.min;
+      const delay = (60 / botWpm) * 1000; // Delay between words in milliseconds
+
+      let botText = "";
+      let wordIndex = 0;
+      let charIndex = 0;
+
+      const typeNextCharacter = () => {
+        if (wordIndex < words.length && userCurrentWordIndex < words.length && raceActive) {
+          const word = words[wordIndex];
+          if (charIndex < word.length) {
+            botText += word[charIndex];
+            botInput.value = botText + " "; // Add space after each word
+            charIndex++;
+          } else {
+            botText += " "; // Add space between words
+            botInput.value = botText;
+            wordIndex++;
+            charIndex = 0;
+          }
+          setTimeout(typeNextCharacter, delay / word.length); // Simulate typing speed
+        } else {
+          clearInterval(botTypingInterval);
+        }
+      };
+
+      typeNextCharacter();
+    };
+
+    // Start bot typing
+    const startBotTyping = () => {
+      simulateBotTyping(); // Simulate typing in the bot's input box
+
+      botTypingInterval = setInterval(() => {
+        if (botCurrentWordIndex < words.length && userCurrentWordIndex < words.length && raceActive) {
+          botTypedWords.push(words[botCurrentWordIndex]);
+          botCurrentWordIndex++;
+          botWpmDisplay.textContent = botWpm;
+          renderSentences();
+        } else {
+          clearInterval(botTypingInterval);
+          checkRaceCompletion();
+        }
+      }, (60 / botWpm) * 1000);
+    };
+
+    // Show results
+    const showResults = (title, message) => {
+      const userAccuracy = userCurrentWordIndex > 0 
+        ? ((userTypedWords.filter((word, index) => word === words[index]).length / userCurrentWordIndex) * 100).toFixed(2)
+        : 0;
+        
+      resultsTitle.textContent = title;
+      resultsMessage.textContent = message;
+      finalUserWpm.textContent = calculateWPM();
+      finalBotWpm.textContent = botWpm;
+      finalWords.textContent = userCurrentWordIndex;
+      finalAccuracy.textContent = `${userAccuracy}%`;
+      resultsOverlay.style.display = "flex";
+    };
+
+    // Check if the race is completed
+    const checkRaceCompletion = () => {
+      if (userCurrentWordIndex === words.length || botCurrentWordIndex === words.length) {
+        raceActive = false;
+        clearInterval(botTypingInterval);
+        
+        if (userCurrentWordIndex === words.length && botCurrentWordIndex === words.length) {
+          showResults("It's a Tie!", "You and the bot finished at the same time!");
+          winSound.play(); // Play win sound for tie
+        } else if (userCurrentWordIndex === words.length) {
+          showResults("You Won!", "Congratulations! You beat the bot!");
+          winSound.play(); // Play win sound
+        } else {
+          showResults("Bot Won!", "Better luck next time! The bot was too fast.");
+          loseSound.play(); // Play lose sound
+        }
+      }
+    };
+
+    // Render sentences for both user and bot
+    const renderSentences = () => {
+      userSentenceContainer.innerHTML = words
+        .map((word, index) => {
+          let className = "";
+          if (index === userCurrentWordIndex) className = "current-word";
+          if (index < userCurrentWordIndex) {
+            className = word === userTypedWords[index] ? "correct-word" : "incorrect-word";
+          }
+          return `<span class="${className}">${word}</span>`;
+        })
+        .join(" ");
+
+      botSentenceContainer.innerHTML = words
+        .map((word, index) => {
+          let className = "";
+          if (index === botCurrentWordIndex) className = "current-word";
+          if (index < botCurrentWordIndex) {
+            className = word === botTypedWords[index] ? "correct-word" : "incorrect-word";
+          }
+          return `<span class="${className}">${word}</span>`;
+        })
+        .join(" ");
+    };
+
+    // Calculate WPM
+    const calculateWPM = () => {
+      if (!userStartTime) return 0;
+      const timeElapsed = (Date.now() - userStartTime) / 60000;
+      return ((userCurrentWordIndex / timeElapsed) || 0).toFixed(2);
+    };
+
+    // Start race
+    const startRace = () => {
+      if (!selectedDifficulty) {
+        alert("Please select a difficulty level!");
+        return;
+      }
+      initializeTest();
+      raceActive = true;
+      startBotTyping();
+    };
+
+    // Hotkey: Ctrl + Enter to start race
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "Enter") {
+        startRace();
+      }
+    });
+
+    // Button handlers
+    startButton.addEventListener("click", startRace);
+    resetButton.addEventListener("click", initializeTest);
+    backButton.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+    closeResults.addEventListener("click", () => {
+      resultsOverlay.style.display = "none";
+      initializeTest();
+    });
+
+    // Select difficulty
+    difficultyButtons.addEventListener("click", (e) => {
+      if (e.target.tagName === "BUTTON") {
+        selectedDifficulty = e.target.id;
+        // Highlight selected difficulty
+        document.querySelectorAll('.difficulty-buttons button').forEach(btn => {
+          btn.style.opacity = '0.7';
+        });
+        e.target.style.opacity = '1';
+      }
+    });
+
+    // Input handler
+    userInput.addEventListener("input", (e) => {
+      const value = e.target.value;
+
+      if (!userStartTime && raceActive) {
+        userStartTime = Date.now();
+      }
+
+      // Play keyboard sound for each keystroke
+      if (raceActive) {
+        keyboardSound.currentTime = 0; // Reset sound to start
+        keyboardSound.play();
+      }
+
+      if (value.endsWith(" ")) {
+        const typedWord = value.trim();
+        userTypedWords.push(typedWord);
+        userInput.value = "";
+        userCurrentWordIndex++;
+
+        userWpmDisplay.textContent = calculateWPM();
+        renderSentences();
+        checkRaceCompletion();
+      }
+    });
+
+    // Initial setup
+    initializeTest();
+  </script>
+</body>
+</html>

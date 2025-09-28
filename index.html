@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: filter 0.3s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Menu Button Styles */
+    .menu-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Side Navigation Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(to bottom, #3498db, #2c3e50);
+      z-index: 200;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 150;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
+
+    .menu-header {
+      padding: 30px 20px 20px;
+      color: white;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .menu-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .menu-items {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #e74c3c;
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Content Styles */
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .sentence-container {
+      margin-bottom: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+      min-height: 60px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+
+    .current-word {
+      background-color: #ffffcc;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .correct-word {
+      color: green;
+    }
+
+    .incorrect-word {
+      color: red;
+      text-decoration: line-through;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-box h3 {
+      margin: 0 0 10px;
+      color: #555;
+      font-size: 18px;
+    }
+
+    .stat-box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .next-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .next-button:hover {
+      background-color: #45a049;
+    }
+
+    .reset-button {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .reset-button:hover {
+      background-color: #e53935;
+    }
+
+    /* Mode Cards */
+    .mode-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .mode-card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .mode-card h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .mode-card p {
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .mode-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+
+    .standard .mode-icon {
+      color: #4CAF50;
+    }
+
+    .timed .mode-icon {
+      color: #e74c3c;
+    }
+
+    .exam .mode-icon {
+      color: #3498db;
+    }
+
+    .bot .mode-icon {
+      color: #9b59b6;
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(to right, #4CAF50, #45a049);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-section h2 {
+      margin-top: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .mode-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .side-menu {
+        width: 80%;
+        left: -100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu Button -->
+  <button class="menu-button">☰</button>
+
+  <!-- Side Navigation Menu -->
+  <div class="side-menu">
+    <div class="menu-header">
+      <h2>Typing Modes</h2>
+    </div>
+    <div class="menu-items">
+      <button class="menu-item" data-target="index.html">
+        <i>🏠</i> Standard Typing
+      </button>
+      <button class="menu-item" data-target="timedrace.html">
+        <i>⏱️</i> Timed Race
+      </button>
+      <button class="menu-item" data-target="typingexam.html">
+        <i>📝</i> Typing Exam
+      </button>
+      <button class="menu-item" data-target="botrace.html">
+        <i>🤖</i> Bot Race
+      </button>
+    </div>
+    <div class="menu-footer">
+      <p>Typing Aptitude Tester v2.0</p>
+    </div>
+  </div>
+
+  <!-- Menu Overlay -->
+  <div class="menu-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    
+    <div class="welcome-section">
+      <h2>Welcome to Typing Aptitude Tester!</h2>
+      <p>Improve your typing speed and accuracy with our various typing modes.</p>
+    </div>
+    
+    <div class="sentence-container" id="sentence-container"></div>
+    <input type="text" id="input" placeholder="Start typing..." autofocus>
+    
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Current WPM</h3>
+        <p id="wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Current Accuracy</h3>
+        <p id="accuracy">100%</p>
+      </div>
+      <div class="stat-box">
+        <h3>Average WPM</h3>
+        <p id="avg-wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Average Accuracy</h3>
+        <p id="avg-accuracy">0%</p>
+      </div>
+      <div class="stat-box">
+        <h3>Highest WPM</h3>
+        <p id="highest-wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Lowest WPM</h3>
+        <p id="lowest-wpm">0</p>
+      </div>
+    </div>
+    
+    <div class="button-group">
+      <button class="next-button" id="next-button">Next Sentence</button>
+      <button class="reset-button" id="reset-button">Reset All</button>
+    </div>
+    
+    <div class="mode-cards">
+      <div class="mode-card standard" data-target="index.html">
+        <div class="mode-icon">⌨️</div>
+        <h3>Standard Typing</h3>
+        <p>Practice typing with unlimited time. Focus on accuracy and building muscle memory.</p>
+        <button class="next-button">Select</button>
+      </div>
+      
+      <div class="mode-card timed" data-target="timedrace.html">
+        <div class="mode-icon">⏱️</div>
+        <h3>Timed Race</h3>
+        <p>Test your speed against the clock. How many words can you type in a limited time?</p>
+        <button class="next-button">Select</button>
+      </div>
+      
+      <div class="mode-card exam" data-target="typingexam.html">
+        <div class="mode-icon">📝</div>
+        <h3>Typing Exam</h3>
+        <p>Examiner sets custom text. Perfect for assessments and formal typing tests.</p>
+        <button class="next-button">Select</button>
+      </div>
+      
+      <div class="mode-card bot" data-target="botrace.html">
+        <div class="mode-icon">🤖</div>
+        <h3>Bot Race</h3>
+        <p>Compete against AI opponents. Challenge yourself to beat the computer!</p>
+        <button class="next-button">Select</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sentences = [
+      "The quick brown fox jumps over the lazy dog.",
+      "Programming is the art of telling another human what one wants the computer to do.",
+      "Practice makes perfect, especially when it comes to typing.",
+      "Coding is fun and challenging at the same time.",
+      "Always strive to learn something new every day.",
+      "The best way to predict the future is to create it.",
+      "Consistency is the key to success in any field.",
+      "Never stop learning because life never stops teaching.",
+      "Hard work beats talent when talent doesn't work hard.",
+      "Success is the sum of small efforts repeated day in and day out."
+    ];
+
+    // DOM elements
+    const sentenceContainer = document.getElementById("sentence-container");
+    const input = document.getElementById("input");
+    const wpmDisplay = document.getElementById("wpm");
+    const accuracyDisplay = document.getElementById("accuracy");
+    const avgWpmDisplay = document.getElementById("avg-wpm");
+    const avgAccuracyDisplay = document.getElementById("avg-accuracy");
+    const highestWpmDisplay = document.getElementById("highest-wpm");
+    const lowestWpmDisplay = document.getElementById("lowest-wpm");
+    const nextButton = document.getElementById("next-button");
+    const resetButton = document.getElementById("reset-button");
+    const menuButton = document.querySelector('.menu-button');
+    const sideMenu = document.querySelector('.side-menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+    const modeCards = document.querySelectorAll('.mode-card');
+
+    // State
+    let currentSentence = "";
+    let words = [];
+    let typedWords = [];
+    let currentWordIndex = 0;
+    let startTime = null;
+
+    // Load stored data
+    let storedData = JSON.parse(localStorage.getItem("typingStats")) || {
+      totalWPM: 0,
+      totalAccuracy: 0,
+      sessionCount: 0,
+      highestWPM: 0,
+      lowestWPM: Infinity
+    };
+
+    // Initialize the test
+    const initializeTest = () => {
+      currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+      words = currentSentence.split(" ");
+      typedWords = [];
+      currentWordIndex = 0;
+      startTime = null;
+      wpmDisplay.textContent = 0;
+      accuracyDisplay.textContent = 100;
+      input.value = "";
+      input.focus();
+      renderSentence();
+      updateAverageStats();
+    };
+
+    // Update average statistics
+    const updateAverageStats = () => {
+      if (storedData.sessionCount > 0) {
+        avgWpmDisplay.textContent = (storedData.totalWPM / storedData.sessionCount).toFixed(2);
+        avgAccuracyDisplay.textContent = (storedData.totalAccuracy / storedData.sessionCount).toFixed(2);
+        highestWpmDisplay.textContent = storedData.highestWPM.toFixed(2);
+        lowestWpmDisplay.textContent = storedData.lowestWPM === Infinity ? 
+          "0.00" : storedData.lowestWPM.toFixed(2);
+      } else {
+        avgWpmDisplay.textContent = "0.00";
+        avgAccuracyDisplay.textContent = "0.00";
+        highestWpmDisplay.textContent = "0.00";
+        lowestWpmDisplay.textContent = "0.00";
+      }
+    };
+
+    // Save results and move to next sentence
+    const saveAndContinue = () => {
+      const currentWPM = parseFloat(wpmDisplay.textContent);
+      const currentAccuracy = parseFloat(accuracyDisplay.textContent);
+
+      if (currentWPM > 0) {
+        // Update highest and lowest WPM
+        if (currentWPM > storedData.highestWPM) {
+          storedData.highestWPM = currentWPM;
+        }
+        if (currentWPM < storedData.lowestWPM || storedData.lowestWPM === Infinity) {
+          storedData.lowestWPM = currentWPM;
+        }
+
+        // Update totals
+        storedData.totalWPM += currentWPM;
+        storedData.totalAccuracy += currentAccuracy;
+        storedData.sessionCount++;
+        
+        localStorage.setItem("typingStats", JSON.stringify(storedData));
+      }
+      
+      initializeTest();
+    };
+
+    // Reset all statistics
+    const fullReset = () => {
+      storedData = { 
+        totalWPM: 0, 
+        totalAccuracy: 0, 
+        sessionCount: 0,
+        highestWPM: 0,
+        lowestWPM: Infinity
+      };
+      localStorage.setItem("typingStats", JSON.stringify(storedData));
+      initializeTest();
+      updateAverageStats();
+    };
+
+    // Render sentence with highlighting
+    const renderSentence = () => {
+      sentenceContainer.innerHTML = words
+        .map((word, index) => {
+          let className = "";
+          if (index === currentWordIndex) className = "current-word";
+          if (index < currentWordIndex) {
+            className = word === typedWords[index] ? "correct-word" : "incorrect-word";
+          }
+          return `<span class="${className}">${word}</span>`;
+        })
+        .join(" ");
+    };
+
+    // Calculate WPM
+    const calculateWPM = () => {
+      if (!startTime) return 0;
+      const timeElapsed = (Date.now() - startTime) / 60000;
+      return ((currentWordIndex / timeElapsed) || 0).toFixed(2);
+    };
+
+    // Calculate accuracy
+    const calculateAccuracy = () => {
+      const correctWords = words.slice(0, currentWordIndex).filter((word, index) => word === typedWords[index]).length;
+      return (((correctWords / currentWordIndex) || 1) * 100).toFixed(2);
+    };
+
+    // Menu functionality
+    const toggleMenu = () => {
+      sideMenu.classList.toggle('active');
+      menuOverlay.classList.toggle('active');
+    };
+
+    const closeMenu = () => {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    };
+
+    const navigateTo = (url) => {
+      window.location.href = url;
+    };
+
+    // Menu event listeners
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navigateTo(item.getAttribute('data-target'));
+      });
+    });
+
+    modeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        navigateTo(card.getAttribute('data-target'));
+      });
+    });
+
+    // Input handler
+    input.addEventListener("input", (e) => {
+      const value = e.target.value;
+
+      if (!startTime) {
+        startTime = Date.now();
+      }
+
+      if (value.endsWith(" ")) {
+        const typedWord = value.trim();
+        typedWords.push(typedWord);
+        input.value = "";
+        currentWordIndex++;
+
+        wpmDisplay.textContent = calculateWPM();
+        accuracyDisplay.textContent = calculateAccuracy();
+        renderSentence();
+
+        if (currentWordIndex === words.length) {
+          setTimeout(() => {
+            saveAndContinue();
+          }, 500);
+        }
+      }
+    });
+
+    // Button handlers
+    nextButton.addEventListener("click", saveAndContinue);
+    resetButton.addEventListener("click", fullReset);
+
+    // Initial setup
+    initializeTest();
+    updateAverageStats();
+  </script>
+</body>
+</html>

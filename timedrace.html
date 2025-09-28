@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Race - Typing Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: filter 0.3s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Menu Button Styles */
+    .menu-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Side Navigation Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(to bottom, #3498db, #2c3e50);
+      z-index: 200;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 150;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
+
+    .menu-header {
+      padding: 30px 20px 20px;
+      color: white;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .menu-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .menu-items {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #e74c3c;
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .time-selector {
+      margin-bottom: 20px;
+    }
+
+    .time-selector button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      margin: 5px;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    .time-selector button:hover {
+      background-color: #45a049;
+    }
+
+    .time-selector input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 150px;
+      text-align: center;
+    }
+
+    .sentence-container {
+      margin-bottom: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+      min-height: 60px;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .current-word {
+      background-color: #ffffcc;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .correct-word {
+      color: green;
+    }
+
+    .incorrect-word {
+      color: red;
+      text-decoration: line-through;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-box h3 {
+      margin: 0 0 10px;
+      color: #555;
+      font-size: 18px;
+    }
+
+    .stat-box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .start-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .start-button:hover {
+      background-color: #45a049;
+    }
+
+    .reset-button {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .reset-button:hover {
+      background-color: #e53935;
+    }
+
+    .back-button {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+
+    .cooldown-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    .cooldown-popup {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    .cooldown-popup h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .cooldown-popup p {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .cooldown-popup .close-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .cooldown-popup .close-button:hover {
+      background-color: #45a049;
+    }
+
+    /* Performance Rating Styles */
+    .performance-rating {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .excellent {
+      background-color: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .great {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 2px solid #bee5eb;
+    }
+
+    .good {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffeaa7;
+    }
+
+    .average {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .needs-improvement {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .performance-condition {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #e9ecef;
+      border-left: 5px solid #007bff;
+    }
+
+    .performance-condition h3 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .performance-condition p {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #6c757d;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .side-menu {
+        width: 80%;
+        left: -100%;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .time-selector button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu Button -->
+  <button class="menu-button">☰</button>
+
+  <!-- Side Navigation Menu -->
+  <div class="side-menu">
+    <div class="menu-header">
+      <h2>Typing Modes</h2>
+    </div>
+    <div class="menu-items">
+      <button class="menu-item" data-target="index.html">
+        <i>🏠</i> Standard Typing
+      </button>
+      <button class="menu-item" data-target="timedrace.html">
+        <i>⏱️</i> Timed Race
+      </button>
+      <button class="menu-item" data-target="typingexam.html">
+        <i>📝</i> Typing Exam
+      </button>
+      <button class="menu-item" data-target="botrace.html">
+        <i>🤖</i> Bot Race
+      </button>
+    </div>
+    <div class="menu-footer">
+      <p>Typing Aptitude Tester v2.0</p>
+    </div>
+  </div>
+
+  <!-- Menu Overlay -->
+  <div class="menu-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Time Race - Typing Test</h1>
+    <div class="time-selector" id="time-selector">
+      <button data-time="30">30s</button>
+      <button data-time="60">60s</button>
+      <button data-time="120">120s</button>
+      <button data-time="180">180s</button>
+      <input type="number" id="custom-time" placeholder="Custom (seconds)" min="10" max="300">
+    </div>
+    <div class="sentence-container" id="sentence-container"></div>
+    <input type="text" id="input" placeholder="Start typing..." autofocus>
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Time Left</h3>
+        <p id="time-left">0s</p>
+      </div>
+      <div class="stat-box">
+        <h3>Your WPM</h3>
+        <p id="wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Accuracy</h3>
+        <p id="accuracy">100%</p>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="start-button" id="start-button">Start Race</button>
+      <button class="reset-button" id="reset-button">Reset</button>
+      <button class="back-button" id="back-button">Back to Main</button>
+    </div>
+  </div>
+
+  <!-- Cooldown Popup -->
+  <div class="cooldown-overlay" id="cooldown-overlay">
+    <div class="cooldown-popup">
+      <h2>Race Finished!</h2>
+      
+      <div id="performance-rating" class="performance-rating"></div>
+      
+      <p>Average WPM: <span id="avg-wpm">0</span></p>
+      <p>Highest WPM: <span id="high-wpm">0</span></p>
+      <p>Lowest WPM: <span id="low-wpm">0</span></p>
+      <p>Words Written: <span id="words-written">0</span></p>
+      <p>Sentences Written: <span id="sentences-written">0</span></p>
+      <p>Average Accuracy: <span id="avg-accuracy">0%</span></p>
+      <p>Misspelled Words: <span id="misspelled-words">0</span></p>
+      
+      <div id="performance-condition" class="performance-condition">
+        <h3>Performance Analysis</h3>
+        <p id="condition-text"></p>
+      </div>
+      
+      <button class="close-button" id="close-button">Close</button>
+    </div>
+  </div>
+
+  <audio id="keyboard-click-sound" src="keyboard_clicks.mp3"></audio>
+
+  <script>
+    const sentences = [
+      "The quick brown fox jumps over the lazy dog.",
+      "Programming is the art of telling another human what one wants the computer to do.",
+      "Practice makes perfect, especially when it comes to typing.",
+      "Coding is fun and challenging at the same time.",
+      "Always strive to learn something new every day.",
+      "The best way to predict the future is to create it.",
+      "Consistency is the key to success in any field.",
+      "Never stop learning because life never stops teaching.",
+      "Hard work beats talent when talent doesn't work hard.",
+      "Success is the sum of small efforts repeated day in and day out.",
+      "She sells seashells by the seashore.",
+      "Unique New York, Unique New York.",
+      "Red lorry, yellow lorry, red lorry, yellow lorry.",
+      "Peter Piper picked a peck of pickled peppers.",
+      "How much wood would a woodchuck chuck if a woodchuck could chuck wood?",
+      "Typing fast is a useful skill in school and at work.",
+      "Always check your spelling and grammar before submitting.",
+      "Learning new things every day keeps the mind sharp."
+    ];
+
+    // DOM elements
+    const sentenceContainer = document.getElementById("sentence-container");
+    const input = document.getElementById("input");
+    const timeLeftDisplay = document.getElementById("time-left");
+    const wpmDisplay = document.getElementById("wpm");
+    const accuracyDisplay = document.getElementById("accuracy");
+    const startButton = document.getElementById("start-button");
+    const resetButton = document.getElementById("reset-button");
+    const backButton = document.getElementById("back-button");
+    const timeSelector = document.getElementById("time-selector");
+    const customTimeInput = document.getElementById("custom-time");
+    const cooldownOverlay = document.getElementById("cooldown-overlay");
+    const avgWpmDisplay = document.getElementById("avg-wpm");
+    const highWpmDisplay = document.getElementById("high-wpm");
+    const lowWpmDisplay = document.getElementById("low-wpm");
+    const wordsWrittenDisplay = document.getElementById("words-written");
+    const sentencesWrittenDisplay = document.getElementById("sentences-written");
+    const avgAccuracyDisplay = document.getElementById("avg-accuracy");
+    const misspelledWordsDisplay = document.getElementById("misspelled-words");
+    const closeButton = document.getElementById("close-button");
+    const performanceRating = document.getElementById("performance-rating");
+    const conditionText = document.getElementById("condition-text");
+    const menuButton = document.querySelector('.menu-button');
+    const sideMenu = document.querySelector('.side-menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    // State
+    let currentSentence = "";
+    let words = [];
+    let typedWords = [];
+    let currentWordIndex = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let raceInterval = null;
+    let selectedTime = 0;
+    let timeLeft = 0;
+    let totalWords = 0;
+    let totalSentences = 0;
+    let totalCorrectWords = 0;
+    let totalMisspelledWords = 0;
+    let wpmHistory = [];
+    let isCooldown = false;
+
+    // Menu functionality
+    const toggleMenu = () => {
+      sideMenu.classList.toggle('active');
+      menuOverlay.classList.toggle('active');
+    };
+
+    const closeMenu = () => {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    };
+
+    const navigateTo = (url) => {
+      window.location.href = url;
+    };
+
+    // Menu event listeners
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navigateTo(item.getAttribute('data-target'));
+      });
+    });
+
+    // Get accuracy compliment
+    const getAccuracyCompliment = (accuracy) => {
+      if (accuracy >= 90) {
+        return { text: "Excellent!", className: "excellent" };
+      } else if (accuracy >= 80) {
+        return { text: "Great!", className: "great" };
+      } else if (accuracy >= 70) {
+        return { text: "Good!", className: "good" };
+      } else if (accuracy >= 60) {
+        return { text: "Average", className: "average" };
+      } else {
+        return { text: "Needs Improvement", className: "needs-improvement" };
+      }
+    };
+
+    // Get performance condition
+    const getPerformanceCondition = (avgWpm, avgAccuracy, misspelledWords, totalWords) => {
+      const misspelledRatio = misspelledWords / totalWords;
+      const fewMisspelled = misspelledRatio < 0.1; // Less than 10% misspelled words
+      
+      if (avgWpm > 60 && avgAccuracy > 80 && fewMisspelled) {
+        return "Great Performance - You have excellent speed and accuracy with very few errors!";
+      } else if (avgWpm > 60 && avgAccuracy >= 70 && avgAccuracy <= 80 && fewMisspelled) {
+        return "Good Performance - You have good speed and accuracy. Try to improve your accuracy a bit more.";
+      } else if (avgWpm < 60 && avgAccuracy < 70) {
+        return "Improvement Needed - Focus on both speed and accuracy. Practice regularly to improve.";
+      } else if (avgWpm > 70 && avgAccuracy < 70 && fewMisspelled) {
+        return "Excellent Speed, Low Accuracy - You type fast but need to work on accuracy. Slow down a bit to improve precision.";
+      } else if (avgWpm < 50 && avgAccuracy > 85 && fewMisspelled) {
+        return "Excellent Accuracy, Slower Speed - Your accuracy is great but you need to work on speed. Try to type more confidently and quickly.";
+      } else {
+        return "Balanced Performance - You have a good balance between speed and accuracy. Keep practicing to improve both.";
+      }
+    };
+
+    // Initialize the test
+    const initializeTest = () => {
+      currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+      words = currentSentence.split(" ");
+      typedWords = [];
+      currentWordIndex = 0;
+      startTime = null;
+      timeLeft = selectedTime;
+      totalWords = 0;
+      totalSentences = 0;
+      totalCorrectWords = 0;
+      totalMisspelledWords = 0;
+      wpmHistory = [];
+      input.value = "";
+      input.focus();
+      renderSentence();
+      updateStats();
+    };
+
+    // Render sentence with highlighting
+    const renderSentence = () => {
+      sentenceContainer.innerHTML = words
+        .map((word, index) => {
+          let className = "";
+          if (index === currentWordIndex) className = "current-word";
+          if (index < currentWordIndex) {
+            className = word === typedWords[index] ? "correct-word" : "incorrect-word";
+          }
+          return `<span class="${className}">${word}</span>`;
+        })
+        .join(" ");
+    };
+
+    // Calculate WPM
+    const calculateWPM = () => {
+      if (!startTime) return 0;
+      const timeElapsed = (selectedTime - timeLeft) / 60; // in minutes
+      return ((currentWordIndex / timeElapsed) || 0).toFixed(2);
+    };
+
+    // Calculate accuracy
+    const calculateAccuracy = () => {
+      const correctWords = words.slice(0, currentWordIndex).filter((word, index) => word === typedWords[index]).length;
+      return (((correctWords / currentWordIndex) || 1) * 100).toFixed(2);
+    };
+
+    // Update stats
+    const updateStats = () => {
+      wpmDisplay.textContent = calculateWPM();
+      accuracyDisplay.textContent = `${calculateAccuracy()}%`;
+      timeLeftDisplay.textContent = `${timeLeft}s`;
+    };
+
+    // Start the race
+    const startRace = () => {
+      if (selectedTime <= 0) {
+        alert("Please select a valid time!");
+        return;
+      }
+      initializeTest();
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+      raceInterval = setInterval(updateRace, 100);
+    };
+
+    // Update the timer
+    const updateTimer = () => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        clearInterval(raceInterval);
+        endRace();
+      }
+      updateStats();
+    };
+
+    // Update the race
+    const updateRace = () => {
+      updateStats();
+    };
+
+    // End the race
+    const endRace = () => {
+      isCooldown = true;
+      input.disabled = true;
+
+      // Calculate final stats
+      const avgWpm = (wpmHistory.reduce((a, b) => a + b, 0) / wpmHistory.length || 0);
+      const highWpm = Math.max(...wpmHistory) || 0;
+      const lowWpm = Math.min(...wpmHistory) || 0;
+      const avgAccuracy = ((totalCorrectWords / totalWords) * 100 || 0);
+
+      // Set accuracy compliment
+      const compliment = getAccuracyCompliment(avgAccuracy);
+      performanceRating.textContent = `Accuracy: ${compliment.text}`;
+      performanceRating.className = `performance-rating ${compliment.className}`;
+      
+      // Set performance condition
+      const condition = getPerformanceCondition(avgWpm, avgAccuracy, totalMisspelledWords, totalWords);
+      conditionText.textContent = condition;
+
+      // Show popup
+      avgWpmDisplay.textContent = avgWpm.toFixed(2);
+      highWpmDisplay.textContent = highWpm.toFixed(2);
+      lowWpmDisplay.textContent = lowWpm.toFixed(2);
+      wordsWrittenDisplay.textContent = totalWords;
+      sentencesWrittenDisplay.textContent = totalSentences;
+      avgAccuracyDisplay.textContent = `${avgAccuracy.toFixed(2)}%`;
+      misspelledWordsDisplay.textContent = totalMisspelledWords;
+      cooldownOverlay.style.display = "flex";
+    };
+
+    // Input handler
+    input.addEventListener("input", (e) => {
+      if (isCooldown) return; // Ignore input during cooldown
+
+      const value = e.target.value;
+
+      if (!startTime) {
+        startTime = Date.now();
+      }
+
+      if (value.endsWith(" ")) {
+        const typedWord = value.trim();
+        typedWords.push(typedWord);
+        input.value = "";
+        currentWordIndex++;
+
+        if (typedWord === words[currentWordIndex - 1]) {
+          totalCorrectWords++;
+        } else {
+          totalMisspelledWords++;
+        }
+
+        totalWords++;
+        wpmHistory.push(parseFloat(calculateWPM()));
+
+        if (currentWordIndex === words.length) {
+          totalSentences++;
+          currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+          words = currentSentence.split(" ");
+          typedWords = [];
+          currentWordIndex = 0;
+        }
+
+        renderSentence();
+        updateStats();
+      }
+    });
+
+    // Time selector
+    timeSelector.addEventListener("click", (e) => {
+      if (e.target.tagName === "BUTTON") {
+        selectedTime = parseInt(e.target.dataset.time);
+        customTimeInput.value = "";
+      }
+    });
+
+    // Custom time input
+    customTimeInput.addEventListener("input", (e) => {
+      selectedTime = parseInt(e.target.value) || 0;
+    });
+
+    // Start race button
+    startButton.addEventListener("click", startRace);
+
+    // Reset button
+    resetButton.addEventListener("click", initializeTest);
+
+    // Back to main button
+    backButton.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    // Close popup button
+    closeButton.addEventListener("click", () => {
+      isCooldown = false;
+      input.disabled = false;
+      cooldownOverlay.style.display = "none";
+      initializeTest();
+    });
+	
+    // Audio play on key press
+    const audio = document.getElementById("keyboard-click-sound");
+    document.addEventListener("keydown", () => {
+      if (audio) {
+        audio.currentTime = 0; // Reset to start for rapid keypresses
+        audio.play();
+      }
+    });
+
+    // Initial setup
+    initializeTest();
+  </script>
+</body>
+</html>

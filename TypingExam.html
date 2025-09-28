@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Exam</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: filter 0.3s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Menu Button Styles */
+    .menu-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Side Navigation Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(to bottom, #3498db, #2c3e50);
+      z-index: 200;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 150;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
+
+    .menu-header {
+      padding: 30px 20px 20px;
+      color: white;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .menu-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .menu-items {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #e74c3c;
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .examiner-section {
+      background-color: #f0f8ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .examiner-section h2 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+
+    #examiner-input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .set-text-button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .set-text-button:hover {
+      background-color: #2980b9;
+    }
+
+    .sentence-container {
+      margin-bottom: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+      min-height: 60px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+
+    .current-word {
+      background-color: #ffffcc;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .correct-word {
+      color: green;
+    }
+
+    .incorrect-word {
+      color: red;
+      text-decoration: line-through;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+    
+    .Candidate-input-group {
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 10px; 
+        margin-bottom: 15px;
+    }
+    
+    .Candidate-input-group input {
+        border-radius: 4px; 
+        padding: 8px; 
+        border: 1px solid #ccc; 
+        margin-bottom: 0;
+    }
+    
+    /* Highlight both required fields */
+    #Candidate-name, #Candidate-id {
+        border: 1px solid #3498db; 
+    }
+
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-box h3 {
+      margin: 0 0 10px;
+      color: #555;
+      font-size: 18px;
+    }
+
+    .stat-box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .next-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .next-button:hover {
+      background-color: #45a049;
+    }
+
+    .reset-button {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .reset-button:hover {
+      background-color: #e53935;
+    }
+
+    .back-button {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+
+    .status-message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* Popup Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    .popup-content {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 700px;
+      width: 90%;
+    }
+
+    .popup-content h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .popup-content p {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .popup-info p {
+        font-size: 16px;
+        margin: 5px 0;
+        text-align: left;
+        color: #34495e;
+    }
+
+    .popup-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .popup-stat {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .popup-stat h3 {
+      margin: 0 0 5px;
+      color: #555;
+      font-size: 16px;
+    }
+
+    .popup-stat p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .close-popup {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .close-popup:hover {
+      background-color: #45a049;
+    }
+
+    .performance-rating {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .excellent {
+      background-color: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .great {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 2px solid #bee5eb;
+    }
+
+    .good {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffeaa7;
+    }
+
+    .average {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .needs-improvement {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .performance-condition {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #e9ecef;
+      border-left: 5px solid #007bff;
+    }
+
+    .performance-condition h3 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .performance-condition p {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #6c757d;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .side-menu {
+        width: 80%;
+        left: -100%;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .Candidate-input-group {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-button">☰</button>
+
+  <div class="side-menu">
+    <div class="menu-header">
+      <h2>Typing Modes</h2>
+    </div>
+    <div class="menu-items">
+      <button class="menu-item" data-target="index.html">
+        <i>🏠</i> Standard Typing
+      </button>
+      <button class="menu-item" data-target="timedrace.html">
+        <i>⏱️</i> Timed Race
+      </button>
+      <button class="menu-item" data-target="typingexam.html">
+        <i>📝</i> Typing Exam
+      </button>
+      <button class="menu-item" data-target="botrace.html">
+        <i>🤖</i> Bot Race
+      </button>
+    </div>
+    <div class="menu-footer">
+      <p>Typing Aptitude Tester v2.0</p>
+    </div>
+  </div>
+
+  <div class="menu-overlay"></div>
+
+  <div class="container">
+    <h1>Typing Exam</h1>
+    
+    <div class="examiner-section">
+      <h2>Candidate Details</h2>
+      
+      <div class="Candidate-input-group">
+        <input type="text" id="Candidate-name" placeholder="Candidate Name">
+        <input type="text" id="Candidate-id" placeholder="Candidate ID">
+      </div>
+      
+      <h2>Exam Text</h2>
+      <textarea id="examiner-input" placeholder="Enter the text for the Candidate to type here..."></textarea>
+      <button class="set-text-button" id="set-text-button">Set Exam Text & Start</button>
+      <div id="status-message" class="status-message"></div>
+    </div>
+    
+    <div class="sentence-container" id="sentence-container">No exam text set. Please enter the Candidate details and exam text above.</div>
+    <input type="text" id="input" placeholder="Start typing..." disabled>
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Current WPM</h3>
+        <p id="wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Current Accuracy</h3>
+        <p id="accuracy">100%</p>
+      </div>
+      <div class="stat-box">
+        <h3>Average WPM</h3>
+        <p id="avg-wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Average Accuracy</h3>
+        <p id="avg-accuracy">0%</p>
+      </div>
+      <div class="stat-box">
+        <h3>Highest WPM</h3>
+        <p id="highest-wpm">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Lowest WPM</h3>
+        <p id="lowest-wpm">0</p>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="next-button" id="next-button" disabled>Next Sentence</button>
+      <button class="reset-button" id="reset-button">Reset All</button>
+      <button class="back-button" id="back-button">Back to Main</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="popup-overlay">
+    <div class="popup-content">
+      <h2 id="popup-header">Exam Completed!</h2>
+      <div id="popup-info">
+        </div>
+      <p id="popup-intro">You have successfully completed the typing exam.</p>
+      
+      <div id="performance-rating" class="performance-rating"></div>
+      
+      <div class="popup-stats">
+        <div class="popup-stat">
+          <h3>Average WPM</h3>
+          <p id="popup-avg-wpm">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Highest WPM</h3>
+          <p id="popup-high-wpm">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Lowest WPM</h3>
+          <p id="popup-low-wpm">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Words Written</h3>
+          <p id="popup-words-written">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Sentences Written</h3>
+          <p id="popup-sentences-written">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Average Accuracy</h3>
+          <p id="popup-avg-accuracy">0%</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Misspelled Words</h3>
+          <p id="popup-misspelled-words">0</p>
+        </div>
+        <div class="popup-stat">
+          <h3>Total Time</h3>
+          <p id="popup-total-time">0s</p>
+        </div>
+      </div>
+      
+      <div id="performance-condition" class="performance-condition">
+        <h3>Performance Analysis</h3>
+        <p id="condition-text"></p>
+      </div>
+      
+      <button class="close-popup" id="close-popup">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const sentenceContainer = document.getElementById("sentence-container");
+    const input = document.getElementById("input");
+    const wpmDisplay = document.getElementById("wpm");
+    const accuracyDisplay = document.getElementById("accuracy");
+    const avgWpmDisplay = document.getElementById("avg-wpm");
+    const avgAccuracyDisplay = document.getElementById("avg-accuracy");
+    const highestWpmDisplay = document.getElementById("highest-wpm");
+    const lowestWpmDisplay = document.getElementById("lowest-wpm");
+    const nextButton = document.getElementById("next-button");
+    const resetButton = document.getElementById("reset-button");
+    const backButton = document.getElementById("back-button");
+    const examinerInput = document.getElementById("examiner-input");
+    const setTextButton = document.getElementById("set-text-button");
+    const statusMessage = document.getElementById("status-message");
+    const popupOverlay = document.getElementById("popup-overlay");
+    const popupAvgWpm = document.getElementById("popup-avg-wpm");
+    const popupHighWpm = document.getElementById("popup-high-wpm");
+    const popupLowWpm = document.getElementById("popup-low-wpm");
+    const popupWordsWritten = document.getElementById("popup-words-written");
+    const popupSentencesWritten = document.getElementById("popup-sentences-written");
+    const popupAvgAccuracy = document.getElementById("popup-avg-accuracy");
+    const popupMisspelledWords = document.getElementById("popup-misspelled-words");
+    const popupTotalTime = document.getElementById("popup-total-time");
+    const closePopup = document.getElementById("close-popup");
+    const performanceRating = document.getElementById("performance-rating");
+    const conditionText = document.getElementById("condition-text");
+    const menuButton = document.querySelector('.menu-button');
+    const sideMenu = document.querySelector('.side-menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    // DOM ELEMENTS FOR NAMES/IDs
+    const CandidateNameInput = document.getElementById("Candidate-name");
+    const CandidateIdInput = document.getElementById("Candidate-id");
+    const popupHeader = document.getElementById("popup-header");
+    const popupIntro = document.getElementById("popup-intro");
+    const popupInfo = document.getElementById("popup-info");
+    const examinerSection = document.querySelector('.examiner-section');
+
+
+    // State
+    let currentSentence = "";
+    let words = [];
+    let typedWords = [];
+    let currentWordIndex = 0;
+    let startTime = null;
+    let examTexts = []; // Will store sentences from examiner input
+    let currentExamIndex = 0;
+    let examSessionStats = {
+      wpmHistory: [],
+      totalWords: 0,
+      totalCorrectWords: 0,
+      totalSentences: 0,
+      totalMisspelledWords: 0,
+      startTime: null,
+      endTime: null
+    };
+
+    // Load stored data
+    let storedData = JSON.parse(localStorage.getItem("typingExamStats")) || {
+      totalWPM: 0,
+      totalAccuracy: 0,
+      sessionCount: 0,
+      highestWPM: 0,
+      lowestWPM: Infinity
+    };
+
+    // Menu functionality
+    const toggleMenu = () => {
+      sideMenu.classList.toggle('active');
+      menuOverlay.classList.toggle('active');
+    };
+
+    const closeMenu = () => {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    };
+
+    const navigateTo = (url) => {
+      window.location.href = url;
+    };
+
+    // Menu event listeners
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navigateTo(item.getAttribute('data-target'));
+      });
+    });
+
+    // Show status message
+    const showStatusMessage = (message, type) => {
+      statusMessage.textContent = message;
+      statusMessage.className = `status-message ${type}`;
+      setTimeout(() => {
+        statusMessage.textContent = "";
+        statusMessage.className = "status-message";
+      }, 3000);
+    };
+
+    // Set exam text from examiner input
+    const setExamText = () => {
+      const text = examinerInput.value.trim();
+      const CandidateName = CandidateNameInput.value.trim();
+      const CandidateId = CandidateIdInput.value.trim();
+
+      // UPDATED VALIDATION: Both Name and ID are required
+      if (CandidateName === "" || CandidateId === "") {
+        showStatusMessage("Please enter **both the Candidate Name and Candidate ID** before setting the exam.", "error");
+        return;
+      }
+
+      if (text === "") {
+        showStatusMessage("Please enter some text for the exam.", "error");
+        return;
+      }
+      
+      // Split text into sentences (simple split by period for now)
+      examTexts = text.split('.').filter(s => s.trim() !== '').map(s => s.trim() + '.');
+      
+      if (examTexts.length === 0) {
+        showStatusMessage("Please enter valid text with at least one sentence.", "error");
+        return;
+      }
+      
+      // Reset exam session
+      currentExamIndex = 0;
+      examSessionStats = {
+        wpmHistory: [],
+        totalWords: 0,
+        totalCorrectWords: 0,
+        totalSentences: 0,
+        totalMisspelledWords: 0,
+        startTime: null,
+        endTime: null
+      };
+      
+      // Enable Candidate input and buttons
+      input.disabled = false;
+      nextButton.disabled = false;
+      
+      // Hide Candidate/examiner section to avoid modification during the exam
+      examinerSection.style.display = 'none';
+
+      // Initialize with the first sentence
+      initializeTest();
+      showStatusMessage(`Exam text set successfully! **${CandidateName}** can now begin typing.`, "success");
+    };
+
+    // Initialize the test
+    const initializeTest = () => {
+      if (examTexts.length === 0) {
+        sentenceContainer.textContent = "No exam text set. Please enter the Candidate details and exam text above.";
+        input.disabled = true;
+        nextButton.disabled = true;
+        examinerSection.style.display = 'block'; // Show input section if no text is set
+        return;
+      }
+      
+      // Get the next sentence
+      if (currentExamIndex < examTexts.length) {
+        currentSentence = examTexts[currentExamIndex];
+        words = currentSentence.split(" ");
+        typedWords = [];
+        currentWordIndex = 0;
+        startTime = null;
+        wpmDisplay.textContent = 0;
+        accuracyDisplay.textContent = "100%";
+        input.value = "";
+        input.focus();
+        renderSentence();
+        updateAverageStats();
+        
+        // Set exam start time if not already set
+        if (!examSessionStats.startTime) {
+          examSessionStats.startTime = Date.now();
+        }
+      } else {
+        // All sentences completed
+        endExam();
+      }
+    };
+
+    // Get accuracy compliment
+    const getAccuracyCompliment = (accuracy) => {
+      if (accuracy >= 90) {
+        return { text: "Excellent!", className: "excellent" };
+      } else if (accuracy >= 80) {
+        return { text: "Great!", className: "great" };
+      } else if (accuracy >= 70) {
+        return { text: "Good!", className: "good" };
+      } else if (accuracy >= 60) {
+        return { text: "Average", className: "average" };
+      } else {
+        return { text: "Needs Improvement", className: "needs-improvement" };
+      }
+    };
+
+    // Get performance condition
+    const getPerformanceCondition = (avgWpm, avgAccuracy, misspelledWords, totalWords) => {
+      const misspelledRatio = totalWords > 0 ? misspelledWords / totalWords : 0;
+      const fewMisspelled = misspelledRatio < 0.1; // Less than 10% misspelled words
+      
+      if (avgWpm > 60 && avgAccuracy > 80 && fewMisspelled) {
+        return "Great Performance - You have excellent speed and accuracy with very few errors!";
+      } else if (avgWpm > 60 && avgAccuracy >= 70 && avgAccuracy <= 80 && fewMisspelled) {
+        return "Good Performance - You have good speed and accuracy. Try to improve your accuracy a bit more.";
+      } else if (avgWpm < 60 && avgAccuracy < 70) {
+        return "Improvement Needed - Focus on both speed and accuracy. Practice regularly to improve.";
+      } else if (avgWpm > 70 && avgAccuracy < 70 && fewMisspelled) {
+        return "Excellent Speed, Low Accuracy - You type fast but need to work on accuracy. Slow down a bit to improve precision.";
+      } else if (avgWpm < 50 && avgAccuracy > 85 && fewMisspelled) {
+        return "Excellent Accuracy, Slower Speed - Your accuracy is great but you need to work on speed. Try to type more confidently and quickly.";
+      } else {
+        return "Balanced Performance - You have a good balance between speed and accuracy. Keep practicing to improve both.";
+      }
+    };
+
+    // End the exam and show popup
+    const endExam = () => {
+      examSessionStats.endTime = Date.now();
+      
+      // Get Candidate details (both will be present due to the new validation)
+      const CandidateName = CandidateNameInput.value.trim();
+      const CandidateId = CandidateIdInput.value.trim();
+
+      // Update popup header
+      popupHeader.textContent = `${CandidateName}'s Exam Result`;
+      
+      // Create and display info section
+      let infoHTML = `
+        <p><strong>Candidate Name:</strong> ${CandidateName}</p>
+        <p><strong>Candidate ID:</strong> ${CandidateId}</p>
+      `;
+      popupInfo.innerHTML = infoHTML;
+      popupIntro.style.display = 'none'; // Hide the generic intro text
+
+      // Calculate final stats
+      const totalTime = (examSessionStats.endTime - examSessionStats.startTime) / 1000;
+      const avgWpm = examSessionStats.wpmHistory.length > 0
+        ? (examSessionStats.wpmHistory.reduce((a, b) => a + b, 0) / examSessionStats.wpmHistory.length)
+        : 0;
+      const highWpm = examSessionStats.wpmHistory.length > 0
+        ? Math.max(...examSessionStats.wpmHistory)
+        : 0;
+      const lowWpm = examSessionStats.wpmHistory.length > 0
+        ? Math.min(...examSessionStats.wpmHistory)
+        : 0;
+      const avgAccuracy = examSessionStats.totalWords > 0
+        ? ((examSessionStats.totalCorrectWords / examSessionStats.totalWords) * 100)
+        : 0;
+
+      // Update popup with stats
+      popupAvgWpm.textContent = avgWpm.toFixed(2);
+      popupHighWpm.textContent = highWpm.toFixed(2);
+      popupLowWpm.textContent = lowWpm.toFixed(2);
+      popupWordsWritten.textContent = examSessionStats.totalWords;
+      popupSentencesWritten.textContent = examSessionStats.totalSentences;
+      popupAvgAccuracy.textContent = `${avgAccuracy.toFixed(2)}%`;
+      popupMisspelledWords.textContent = examSessionStats.totalMisspelledWords;
+      popupTotalTime.textContent = `${totalTime.toFixed(1)}s`;
+      
+      // Set accuracy compliment
+      const compliment = getAccuracyCompliment(avgAccuracy);
+      performanceRating.textContent = `Accuracy: ${compliment.text}`;
+      performanceRating.className = `performance-rating ${compliment.className}`;
+      
+      // Set performance condition
+      const condition = getPerformanceCondition(avgWpm, avgAccuracy, examSessionStats.totalMisspelledWords, examSessionStats.totalWords);
+      conditionText.textContent = condition;
+      
+      // Show popup
+      popupOverlay.style.display = "flex";
+      input.disabled = true;
+      nextButton.disabled = true;
+    };
+
+    // Update average statistics
+    const updateAverageStats = () => {
+      if (storedData.sessionCount > 0) {
+        avgWpmDisplay.textContent = (storedData.totalWPM / storedData.sessionCount).toFixed(2);
+        avgAccuracyDisplay.textContent = (storedData.totalAccuracy / storedData.sessionCount).toFixed(2) + "%";
+        highestWpmDisplay.textContent = storedData.highestWPM.toFixed(2);
+        lowestWpmDisplay.textContent = storedData.lowestWPM === Infinity ? 
+          "0.00" : storedData.lowestWPM.toFixed(2);
+      } else {
+        avgWpmDisplay.textContent = "0.00";
+        avgAccuracyDisplay.textContent = "0.00%";
+        highestWpmDisplay.textContent = "0.00";
+        lowestWpmDisplay.textContent = "0.00";
+      }
+    };
+
+    // Save results and move to next sentence
+    const saveAndContinue = () => {
+      const currentWPM = parseFloat(wpmDisplay.textContent);
+      const currentAccuracy = parseFloat(accuracyDisplay.textContent);
+
+      if (currentWPM > 0) {
+        // Update session stats
+        examSessionStats.wpmHistory.push(currentWPM);
+        
+        // Update highest and lowest WPM
+        if (currentWPM > storedData.highestWPM) {
+          storedData.highestWPM = currentWPM;
+        }
+        if (currentWPM < storedData.lowestWPM || storedData.lowestWPM === Infinity) {
+          storedData.lowestWPM = currentWPM;
+        }
+
+        // Update totals
+        storedData.totalWPM += currentWPM;
+        storedData.totalAccuracy += currentAccuracy;
+        storedData.sessionCount++;
+        
+        localStorage.setItem("typingExamStats", JSON.stringify(storedData));
+      }
+      
+      // Move to next sentence
+      currentExamIndex++;
+      initializeTest();
+    };
+
+    // Reset all statistics
+    const fullReset = () => {
+      storedData = { 
+        totalWPM: 0, 
+        totalAccuracy: 0, 
+        sessionCount: 0,
+        highestWPM: 0,
+        lowestWPM: Infinity
+      };
+      localStorage.setItem("typingExamStats", JSON.stringify(storedData));
+      examTexts = [];
+      currentExamIndex = 0;
+      examinerSection.style.display = 'block'; // Show input section for a fresh start
+      popupOverlay.style.display = "none"; // Hide popup if open
+      initializeTest();
+      updateAverageStats();
+      showStatusMessage("All statistics and exam text have been reset.", "success");
+    };
+
+    // Render sentence with highlighting
+    const renderSentence = () => {
+      sentenceContainer.innerHTML = words
+        .map((word, index) => {
+          let className = "";
+          if (index === currentWordIndex) className = "current-word";
+          if (index < currentWordIndex) {
+            className = word === typedWords[index] ? "correct-word" : "incorrect-word";
+          }
+          return `<span class="${className}">${word}</span>`;
+        })
+        .join(" ");
+    };
+
+    // Calculate WPM
+    const calculateWPM = () => {
+      if (!startTime) return 0;
+      // Use the total number of words typed so far (correct or incorrect)
+      const typedWordCount = currentWordIndex; 
+      const timeElapsed = (Date.now() - startTime) / 60000; // time in minutes
+      // Calculation is based on the number of completed words (WPM = words / minutes)
+      return ((typedWordCount / timeElapsed) || 0).toFixed(2);
+    };
+
+    // Calculate accuracy
+    const calculateAccuracy = () => {
+      if (currentWordIndex === 0) return 100;
+      const correctWords = words.slice(0, currentWordIndex).filter((word, index) => word === typedWords[index]).length;
+      return (((correctWords / currentWordIndex) || 1) * 100).toFixed(2);
+    };
+
+    // Input handler
+    input.addEventListener("input", (e) => {
+      const value = e.target.value;
+
+      if (!startTime) {
+        startTime = Date.now();
+      }
+
+      if (value.endsWith(" ")) {
+        const typedWord = value.trim();
+        typedWords.push(typedWord);
+        
+        // Update session stats
+        examSessionStats.totalWords++;
+        if (typedWord === words[currentWordIndex]) {
+          examSessionStats.totalCorrectWords++;
+        } else {
+          examSessionStats.totalMisspelledWords++;
+        }
+        
+        input.value = "";
+        currentWordIndex++;
+
+        wpmDisplay.textContent = calculateWPM();
+        accuracyDisplay.textContent = calculateAccuracy() + "%";
+        renderSentence();
+
+        if (currentWordIndex === words.length) {
+          examSessionStats.totalSentences++;
+          // Automatically proceed to the next sentence (or end exam) after a short delay
+          setTimeout(() => {
+            saveAndContinue();
+          }, 500);
+        }
+      }
+    });
+
+    // Button handlers
+    setTextButton.addEventListener("click", setExamText);
+    nextButton.addEventListener("click", saveAndContinue);
+    resetButton.addEventListener("click", fullReset);
+    backButton.addEventListener("click", () => {
+      // Assuming index.html is the main page
+      window.location.href = "index.html"; 
+    });
+    closePopup.addEventListener("click", () => {
+      popupOverlay.style.display = "none";
+      fullReset(); // Reset the exam session after closing the results
+    });
+
+    // Initial setup
+    initializeTest();
+    updateAverageStats();
+  </script>
+</body>
+</html>
